@@ -1,0 +1,72 @@
+name: Linter
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  workflow_call:
+
+# Cancel in-progress runs when starting a new one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: sbt
+
+      - name: Install SBT
+        uses: sbt/setup-sbt@v1
+
+      # Check format without modifying files. `continue-on-error` allows subsequent
+      # steps to inspect the outcome and apply a fix rather than stopping immediately.
+      - name: Validate
+        id: validate
+        run: sbt scalafmtCheckAll
+        continue-on-error: true
+
+      # Apply scalafmt in-place. Only runs when the check above found violations.
+      - name: Fix format
+        if: steps.validate.outcome == 'failure'
+        run: sbt scalafmtAll
+
+      # For PRs: commit the fix directly to the PR branch.
+      - name: Commit format fix
+        if: steps.validate.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "[linter] Fixed code style violations with `sbt scalafmtAll`."
+
+      # For pushes to main: open a PR rather than pushing directly.
+      - name: Publish
+        if: steps.validate.outcome == 'failure' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_DIR: .
+          BASE_BRANCH: ${{ github.ref_name }}
+          UPDATE_BRANCH: ci/fix-format
+          PR_TITLE: "[linter] Fixed code style violations with `sbt scalafmtAll`."
+          PR_BODY_FILE: templates/linter.md
+        run: bash scripts/publish.sh
