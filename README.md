@@ -7,7 +7,7 @@
 
 Scalafmt is a popular linter for ensuring that Scala code lives up to project-dependent style rules,
 and then automatically fixing it when it doesn't.
-_Scalafmt Revolver_ provides Scalafmt GitHub integration.
+_Scalafmt Revolver_ provides Scalafmt with GitHub integration.
 This includes:
 - When a pull request targeting the default branch fails the lint check, the code is fixed by an automatic workflow.
 - When the default branch itself fails the lint check, a new pull request is opened to fix this.
