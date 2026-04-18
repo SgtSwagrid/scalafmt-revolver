@@ -24,11 +24,18 @@ jobs:
 
     steps:
 
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          path: repo
+
+      - name: Checkout scalafmt-revolver
+        uses: actions/checkout@v4
+        with:
+          repository: SgtSwagrid/scalafmt-revolver
+          path: scalafmt-revolver
 
       - name: Install Java
         uses: actions/setup-java@v4
@@ -43,12 +50,14 @@ jobs:
       # steps to inspect the outcome and apply a fix rather than stopping immediately.
       - name: Validate
         id: validate
+        working-directory: repo
         run: sbt scalafmtCheckAll
         continue-on-error: true
 
       # Apply scalafmt in-place. Only runs when the check above found violations.
       - name: Fix
         if: steps.validate.outcome == 'failure'
+        working-directory: repo
         run: sbt scalafmtAll
 
       # For PRs: commit the fix directly to the PR branch.
@@ -57,15 +66,16 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "[linter] Fixed code style violations with `sbt scalafmtAll`."
+          repository: repo
 
       # For pushes to main: open a PR rather than pushing directly.
       - name: Publish
         if: steps.validate.outcome == 'failure' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO_DIR: .
+          REPO_DIR: repo
           BASE_BRANCH: ${{ github.ref_name }}
           UPDATE_BRANCH: ci/fix-format
           PR_TITLE: "[linter] Fixed code style violations with `sbt scalafmtAll`."
-          PR_BODY_FILE: templates/linter.md
-        run: bash scripts/publish.sh
+          PR_BODY_FILE: scalafmt-revolver/templates/linter.md
+        run: bash scalafmt-revolver/scripts/publish.sh
