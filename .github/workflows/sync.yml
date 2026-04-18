@@ -1,0 +1,10 @@
+name: Sync
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run:
+    uses: SgtSwagrid/github-graph/.github/workflows/sync.yml@main
+    secrets: inherit
