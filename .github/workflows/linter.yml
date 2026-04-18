@@ -75,7 +75,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_DIR: repo
           BASE_BRANCH: ${{ github.ref_name }}
-          UPDATE_BRANCH: ci/fix-format
+          UPDATE_BRANCH: ci/scalafmt
           PR_TITLE: "[linter] Fixed code style violations with `sbt scalafmtAll`."
           PR_BODY_FILE: scalafmt-revolver/templates/pull-request-body.md
         run: bash scalafmt-revolver/scripts/publish.sh

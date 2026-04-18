@@ -3,6 +3,15 @@
   <p>A tool to automatically fix <a href="https://scalameta.org/scalafmt/">Scalafmt</a> violations.</p>
 </div>
 
+## 💡 Overview
+
+Scalafmt is a popular linter for ensuring that Scala code lives up to project-dependent style rules,
+and then automatically fixing it when it doesn't.
+_Scalafmt Revolver_ provides Scalafmt with GitHub integration.
+This includes:
+- When a pull request targeting the default branch fails the lint check, the code is fixed by an automatic workflow.
+- When the default branch itself fails the lint check, a new pull request is opened to fix this.
+
 ## 🚨 Problem
 
 Scalafmt is a popular formatter for ensuring that Scala code conforms to project-defined style rules.
@@ -71,7 +80,7 @@ No further configuration is required beyond having a `.scalafmt.conf` in your re
 
 If a formatting violation is detected:
 - On a **pull request**, the fix is committed directly to the PR branch and the workflow passes.
-- On a **push to main**, a new pull request (`ci/fix-format`) is opened with the fix applied.
+- On a **push to main**, a new pull request (`ci/scalafmt`) is opened with the fix applied.
 
 The workflow can also be triggered manually from the **Actions** tab using `workflow_dispatch`.
 
