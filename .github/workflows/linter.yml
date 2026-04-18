@@ -35,7 +35,6 @@ jobs:
         with:
           java-version: "21"
           distribution: "temurin"
-          cache: sbt
 
       - name: Install SBT
         uses: sbt/setup-sbt@v1
