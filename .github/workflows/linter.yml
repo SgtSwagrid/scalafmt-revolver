@@ -47,12 +47,12 @@ jobs:
         continue-on-error: true
 
       # Apply scalafmt in-place. Only runs when the check above found violations.
-      - name: Fix format
+      - name: Fix
         if: steps.validate.outcome == 'failure'
         run: sbt scalafmtAll
 
       # For PRs: commit the fix directly to the PR branch.
-      - name: Commit format fix
+      - name: Commit
         if: steps.validate.outcome == 'failure' && github.event_name == 'pull_request'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
