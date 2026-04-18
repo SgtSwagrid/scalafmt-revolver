@@ -1,6 +1,7 @@
-# 🔫 Scalafmt Revolver
-
-A tool to automatically fix [Scalafmt](https://scalameta.org/scalafmt/) violations.
+<div align="center">
+  <h1>🔫Scalafmt Revolver</h1>
+  <p>A tool to automatically fix <a href="https://scalameta.org/scalafmt/">Scalafmt</a> violations.</p>
+</div>
 
 ## 🚨 Problem
 
