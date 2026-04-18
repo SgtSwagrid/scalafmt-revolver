@@ -28,7 +28,7 @@ else
   git -C "$REPO_DIR" push --force origin "$UPDATE_BRANCH"
 
   # 2. Open a new pull request if there isn't one already.
-  pr_exists=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$UPDATE_BRANCH" --state open -json number --jq 'length > 0')
+  pr_exists=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$UPDATE_BRANCH" --state open --json number --jq 'length > 0')
 
   if [[ "$pr_exists" == "false" ]]; then
     gh pr create --repo "$GITHUB_REPOSITORY" --head "$UPDATE_BRANCH" --base "$BASE_BRANCH" --title "$PR_TITLE" --body "$PR_BODY"
