@@ -30,7 +30,7 @@ on:
 
 jobs:
   lint:
-    uses: SgtSwagrid/scalafmt-revolver/.github/workflows/linter.yml@main
+    uses: SgtSwagrid/scalafmt-revolver/linter.yml@main
     secrets:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 ```
