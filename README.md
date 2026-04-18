@@ -58,7 +58,7 @@ No further configuration is required beyond having a `.scalafmt.conf` in your re
 
 If a formatting violation is detected:
 - On a **pull request**, the fix is committed directly to the PR branch and the workflow passes.
-- On a **push to main**, a new pull request (`ci/scalafmt`) is opened with the fix applied.
+- On a **push to main**, a new pull request (`scalafmt`) is opened with the fix applied.
 
 The workflow can also be triggered manually from the **Actions** tab using `workflow_dispatch`.
 
