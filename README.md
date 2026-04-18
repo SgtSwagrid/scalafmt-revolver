@@ -46,7 +46,6 @@ you'll need a [Personal Access Token](https://docs.github.com/en/authentication/
 > As such, this isn't supported here.
 
 You can manage your tokens [here](https://github.com/settings/personal-access-tokens).
-
 Once created, add it as a repository secret named `GH_TOKEN` under:
 > **Settings → Secrets and variables → Actions → New repository secret**
 
