@@ -12,19 +12,6 @@ This includes:
 - When a pull request targeting the default branch fails the lint check, the code is fixed by an automatic workflow.
 - When the default branch itself fails the lint check, a new pull request is opened to fix this.
 
-## 🚨 Problem
-
-Scalafmt is a popular formatter for ensuring that Scala code conforms to project-defined style rules.
-An important limitation, however, is that it only checks and fixes formatting locally.
-Without additional tooling, it's easy for violations to slip into a repository — either on a pull request branch or directly on the default branch.
-
-## 💡 Solution
-
-_Scalafmt Revolver_ provides Scalafmt with GitHub integration.
-A GitHub workflow watches for formatting violations and fixes them automatically:
-- When a pull request targeting the default branch fails the lint check, the fix is committed directly to the PR branch.
-- When the default branch itself fails the lint check, a new pull request is opened to fix this.
-
 ## ⬇️ Installation
 
 ### 1. Add the linter workflow
