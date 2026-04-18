@@ -26,7 +26,6 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-  workflow_call:
 
 jobs:
   lint:
