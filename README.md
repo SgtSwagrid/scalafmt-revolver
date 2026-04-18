@@ -66,4 +66,4 @@ The workflow can also be triggered manually from the **Actions** tab using `work
 
 - See [GitHub Graph](https://github.com/SgtSwagrid/github-graph) for a similar tool to duplicate files across multiple GitHub repositories.
 - See [GitHub Rules](https://github.com/SgtSwagrid/github-rules) for a similar tool to define GitHub [rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) in-source.
-- This project is configured by [Git Config](https://github.com/SgtSwagrid/git-config).
+- This project is configured by [GitHub Config](https://github.com/SgtSwagrid/github-config).
