@@ -42,12 +42,14 @@ you'll need a [Personal Access Token](https://docs.github.com/en/authentication/
 - `Contents` with access `Read and write`.
 - `Pull requests` with access `Read and write`.
 
-You can manage your tokens [here](https://github.com/settings/personal-access-tokens).
-Once created, add it as a repository secret named `GH_TOKEN` under:
-> **Settings → Secrets and variables → Actions → New repository secret**
-
 > **Note:** Without a PAT, the built-in `GITHUB_TOKEN` can still create PRs and commits,
 > but those commits won't trigger further CI workflows due to a GitHub limitation.
+> As such, this isn't supported here.
+
+You can manage your tokens [here](https://github.com/settings/personal-access-tokens).
+
+Once created, add it as a repository secret named `GH_TOKEN` under:
+> **Settings → Secrets and variables → Actions → New repository secret**
 
 ## 🔨 Usage
 
