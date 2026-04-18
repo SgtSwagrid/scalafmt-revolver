@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      GH_TOKEN:
         required: true
 
 # Cancel in-progress runs when starting a new one.
@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           path: repo
 
       - name: Checkout scalafmt-revolver
@@ -75,7 +75,7 @@ jobs:
       - name: Publish
         if: steps.validate.outcome == 'failure' && github.event_name == 'push'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           REPO_DIR: repo
           BASE_BRANCH: ${{ github.ref_name }}
           UPDATE_BRANCH: scalafmt

@@ -31,7 +31,7 @@ jobs:
   lint:
     uses: SgtSwagrid/scalafmt-revolver/.github/workflows/linter.yml@main
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 ```
 
 ### 2. Create a Personal Access Token
