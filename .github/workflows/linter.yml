@@ -77,5 +77,5 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           UPDATE_BRANCH: ci/fix-format
           PR_TITLE: "[linter] Fixed code style violations with `sbt scalafmtAll`."
-          PR_BODY_FILE: scalafmt-revolver/templates/linter.md
+          PR_BODY_FILE: scalafmt-revolver/templates/pull-request-body.md
         run: bash scalafmt-revolver/scripts/publish.sh
