@@ -5,8 +5,11 @@
 
 ## 💡 Overview
 
-> Better to light a candle than curse the darkness.
-> — William L. Watkinson
+<br/>
+
+> "Better to light a candle than curse the darkness." — William L. Watkinson
+
+<br/>
 
 Scalafmt is a popular linter for ensuring that Scala code lives up to project-dependent style rules,
 and then automatically fixing it when it doesn't.
