@@ -26,18 +26,27 @@ runs:
     # Scalafmt's native image, of the version which the configuration names,
     # needs neither Java nor sbt. It checks what `sbt scalafmtCheckAll` does:
     # every project's sources, not their resources, nor the build definition,
-    # but each only once, however many platforms share it.
+    # but each only once, however many platforms share it. Without sources,
+    # as in a repository of configuration, there is nothing to install.
     - name: Install scalafmt
       shell: bash
       working-directory: ${{ inputs.directory }}
       run: |
-        version=$(sed -nE 's/^version *= *"?([0-9.]+)"?.*/\1/p' .scalafmt.conf)
         mkdir -p "$RUNNER_TEMP/scalafmt-revolver"
+        git ls-files -z -- ':(glob)**/src/**/*.scala' ':(glob,exclude)**/src/*/resources/**' \
+          > "$RUNNER_TEMP/scalafmt-revolver/sources"
+        if [[ ! -s "$RUNNER_TEMP/scalafmt-revolver/sources" ]]; then
+          echo "There are no Scala sources to check."
+          exit 0
+        fi
+        version=$(sed -nE 's/^version *= *"?([0-9.]+)"?.*/\1/p' .scalafmt.conf)
+        if [[ -z "$version" ]]; then
+          echo "::error::.scalafmt.conf names no Scalafmt version."
+          exit 1
+        fi
         curl -fsSL -o "$RUNNER_TEMP/scalafmt-revolver/scalafmt" \
           "https://github.com/scalameta/scalafmt/releases/download/v$version/scalafmt-linux-glibc"
         chmod +x "$RUNNER_TEMP/scalafmt-revolver/scalafmt"
-        git ls-files -z -- ':(glob)**/src/**/*.scala' ':(glob,exclude)**/src/*/resources/**' \
-          > "$RUNNER_TEMP/scalafmt-revolver/sources"
 
     - name: Check formatting
       id: check
