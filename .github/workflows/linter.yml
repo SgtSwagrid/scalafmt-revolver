@@ -34,51 +34,18 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: repo
 
+      # The action as of this repository's own pull request when it runs on one,
+      # so that a change to it is tried before it is merged, or else of `main`.
       - name: Checkout scalafmt-revolver
         uses: actions/checkout@v4
         with:
           repository: SgtSwagrid/scalafmt-revolver
           path: scalafmt-revolver
 
-      - name: Install Java
-        uses: actions/setup-java@v4
+      # Checks the formatting, and fixes it if need be (see `action.yml`):
+      # by a commit to a pull request, or else by a pull request of its own.
+      - name: Lint
+        uses: ./scalafmt-revolver
         with:
-          java-version: "21"
-          distribution: "temurin"
-
-      - name: Install SBT
-        uses: sbt/setup-sbt@v1
-
-      # Check format without modifying files. `continue-on-error` allows subsequent
-      # steps to inspect the outcome and apply a fix rather than stopping immediately.
-      - name: Validate
-        id: validate
-        working-directory: repo
-        run: sbt scalafmtCheckAll
-        continue-on-error: true
-
-      # Apply scalafmt in-place. Only runs when the check above found violations.
-      - name: Fix
-        if: steps.validate.outcome == 'failure'
-        working-directory: repo
-        run: sbt scalafmtAll
-
-      # For PRs: commit the fix directly to the PR branch.
-      - name: Commit
-        if: steps.validate.outcome == 'failure' && github.event_name == 'pull_request'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "[linter] Fixed code style violations with `sbt scalafmtAll`."
-          repository: repo
-
-      # For pushes to main: open a PR rather than pushing directly.
-      - name: Publish
-        if: steps.validate.outcome == 'failure' && github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          REPO_DIR: repo
-          BASE_BRANCH: ${{ github.ref_name }}
-          UPDATE_BRANCH: scalafmt
-          PR_TITLE: "[scalafmt-revolver] Fixed code style violations with `sbt scalafmtAll`."
-          PR_BODY_FILE: scalafmt-revolver/templates/pull-request-body.md
-        run: bash scalafmt-revolver/scripts/publish.sh
+          token: ${{ secrets.GH_TOKEN }}
+          directory: repo
