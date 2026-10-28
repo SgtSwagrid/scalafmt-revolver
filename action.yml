@@ -1,0 +1,90 @@
+name: Scalafmt Revolver
+description: >-
+  Checks that a repository's Scala sources are formatted, and fixes them if
+  not: by a commit to a pull request's branch, or else by a pull request.
+
+inputs:
+  token:
+    description: >-
+      A personal access token which can push and open pull requests. The
+      repository must have been checked out with it, so that the fix starts CI,
+      which a commit pushed with the job's own token would not.
+    required: true
+  directory:
+    description: The directory into which the repository was checked out.
+    default: .
+
+outputs:
+  formatted:
+    description: Whether the sources were formatted already, as `true` or `false`.
+    value: ${{ steps.check.outputs.formatted }}
+
+runs:
+  using: composite
+  steps:
+
+    # Scalafmt's native image, of the version which the configuration names,
+    # needs neither Java nor sbt. It checks what `sbt scalafmtCheckAll` does:
+    # every project's sources, not their resources, nor the build definition,
+    # but each only once, however many platforms share it. Without sources,
+    # as in a repository of configuration, there is nothing to install.
+    - name: Install scalafmt
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        mkdir -p "$RUNNER_TEMP/scalafmt-revolver"
+        git ls-files -z -- ':(glob)**/src/**/*.scala' ':(glob,exclude)**/src/*/resources/**' \
+          > "$RUNNER_TEMP/scalafmt-revolver/sources"
+        if [[ ! -s "$RUNNER_TEMP/scalafmt-revolver/sources" ]]; then
+          echo "There are no Scala sources to check."
+          exit 0
+        fi
+        version=$(sed -nE 's/^version *= *"?([0-9.]+)"?.*/\1/p' .scalafmt.conf)
+        if [[ -z "$version" ]]; then
+          echo "::error::.scalafmt.conf names no Scalafmt version."
+          exit 1
+        fi
+        curl -fsSL -o "$RUNNER_TEMP/scalafmt-revolver/scalafmt" \
+          "https://github.com/scalameta/scalafmt/releases/download/v$version/scalafmt-linux-glibc"
+        chmod +x "$RUNNER_TEMP/scalafmt-revolver/scalafmt"
+
+    - name: Check formatting
+      id: check
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        if xargs -0 -r "$RUNNER_TEMP/scalafmt-revolver/scalafmt" --check --non-interactive \
+          --respect-project-filters < "$RUNNER_TEMP/scalafmt-revolver/sources"; then
+          echo "formatted=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "formatted=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Fix formatting
+      if: steps.check.outputs.formatted == 'false'
+      shell: bash
+      working-directory: ${{ inputs.directory }}
+      run: |
+        xargs -0 -r "$RUNNER_TEMP/scalafmt-revolver/scalafmt" --non-interactive \
+          --respect-project-filters < "$RUNNER_TEMP/scalafmt-revolver/sources"
+
+    # A pull request is given the fix as a commit of its own.
+    - name: Commit formatting
+      if: steps.check.outputs.formatted == 'false' && github.event_name == 'pull_request'
+      uses: stefanzweifel/git-auto-commit-action@v7
+      with:
+        commit_message: "[linter] Fixed code style violations with Scalafmt."
+        repository: ${{ inputs.directory }}
+
+    # Anything else is offered it in a pull request.
+    - name: Propose formatting
+      if: steps.check.outputs.formatted == 'false' && github.event_name != 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        REPO_DIR: ${{ inputs.directory }}
+        BASE_BRANCH: ${{ github.ref_name }}
+        UPDATE_BRANCH: scalafmt
+        PR_TITLE: "[scalafmt-revolver] Fixed code style violations with Scalafmt."
+        PR_BODY_FILE: ${{ github.action_path }}/templates/pull-request-body.md
+      run: bash "$GITHUB_ACTION_PATH/scripts/publish.sh"

@@ -40,6 +40,26 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 ```
 
+Alternatively, to lint as a step of a job of your own, such as the one which builds your project,
+use the action after checking out your repository with the token (see below):
+
+```yaml
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Lint
+        id: lint
+        uses: SgtSwagrid/scalafmt-revolver@main
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+```
+
+Its output `formatted` is `false` when a fix was needed, after which you may want to stop the job,
+since the fix will be checked again by the run which it starts.
+
 ### 2. Create a Personal Access Token
 
 In order for GitHub Actions to automatically commit fixes and manage pull requests,
@@ -59,6 +79,8 @@ Once created, add it as a repository secret named `GH_TOKEN` under:
 
 Once installed, the linter runs automatically on every push and pull request targeting the default branch.
 No further configuration is required beyond having a `.scalafmt.conf` in your repository.
+It runs the native image of the Scalafmt version which that names, so needs neither Java nor sbt,
+and checks what `sbt scalafmtCheckAll` would: the Scala sources under each `src` directory, other than resources.
 
 If a formatting violation is detected:
 - On a **pull request**, the fix is committed directly to the PR branch and the workflow passes.
